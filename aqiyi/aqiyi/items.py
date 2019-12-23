@@ -8,7 +8,15 @@
 import scrapy
 
 
-class AqiyiItem(scrapy.Item):
+class MovieItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    pass
+
+
+class MovieDetailItem(scrapy.Item):
+    pass
+
+
+class ActorItem(scrapy.Item):
     pass
