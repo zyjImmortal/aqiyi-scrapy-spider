@@ -9,6 +9,7 @@ verify_ssl = true
 scrapy = "*"
 flask = "*"
 sqlalchemy = "*"
+scrapy-redis = "*"
 
 [requires]
 python_version = "3.6"

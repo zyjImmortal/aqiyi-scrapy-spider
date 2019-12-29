@@ -20,7 +20,7 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36
 
 # Obey robots.txt rules
 # ROBOTSTXT_OBEY = True
-
+COOKIE_DEBUG = True
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
 
@@ -94,3 +94,9 @@ DB_URL = ''
 DB_USER = ''
 DB_PASSWORD = ''
 DB_NAME = ''
+
+
+#redis地址
+REDIS_HOST='127.0.0.1'
+REDIS_PORT=6379
+REDIS_DB=0
