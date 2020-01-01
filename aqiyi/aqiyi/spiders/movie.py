@@ -4,16 +4,16 @@ import time
 
 import redis
 import scrapy
-from scrapy import  Request
+from scrapy import Request
 from scrapy.utils.project import get_project_settings
 
-client = redis.Redis(host=get_project_settings().get('REDIS_HOST'), port=get_project_settings().get('REDIS_PORT'),db=get_project_settings().get('REDIS_DB'))
+client = redis.Redis(host=get_project_settings().get('REDIS_HOST'), port=get_project_settings().get('REDIS_PORT'),
+                     db=get_project_settings().get('REDIS_DB'))
 client.set("error", 0)
-#12小时过期
-client.expire("error", 60*60*12)
+# 12小时过期
+client.expire("error", 60 * 60 * 12)
 
-from aqiyi.items import PerformerDetailTableItem, ActorItem, MainCharactorItem, DirectorItem, \
-    CategoryItem, MovieTableItem
+from aqiyi.items import PerformerDetailTableItem, MovieItem, MovieDetailItem, MoviePerformerItem, CategoryMovieItem
 
 
 class MovieSpider(scrapy.Spider):
@@ -53,26 +53,28 @@ class MovieSpider(scrapy.Spider):
                 if focus is not None:
                     focus = focus.replace('"', '\\"')
                 # 组装模型存入数据库
-                movie = MovieTableItem()
-                movie['id'] = id
-                movie['movie_id'] = item['tvId']
-                movie['channel_id'] = item['channelId']
-                movie['description'] = description
-                movie['name'] = item['name']
-                movie['play_url'] = item['playUrl']
-                movie['duration'] = item['duration']
-                movie['focus'] = focus
+                movie = MovieItem()
+                movie['id'] = item['tvId']
+                movie['moviename'] = item['name']
+                movie['url'] = item['playUrl']
                 movie['score'] = item.get('score') or 0
-                movie['second_info'] = item['secondInfo']
-                movie['format_period'] = item['formatPeriod']
-                movie['site_id'] = 'iqiyi'
+                movie['source'] = 'iqiyi'
+                movie['status'] = item['payMark']
                 try:
-                    movie['issue_time'] = item['issueTime']
+                    movie['time'] = item['duration']
                 except:
-                    movie['issue_time'] = 0
-                movie['image_url'] = item['imageUrl']
-                movie['timestamp'] = int(time.time())
+                    movie['time'] = 0
+                movie['imagepath'] = item['imageUrl']
                 yield movie
+
+                movie_detail = MovieDetailItem()
+                movie_detail['director'] = item['cast'].get('director')
+                movie_detail['director_id'] = item['cast'].get('id')
+                movie_detail['des'] = item['description']
+                movie_detail['category'] = ','.join([category['name'] for category in item['categories']])
+                movie_detail['movie_id'] = item['tvId']
+                movie_detail['keyword'] = item['focus']
+                yield movie_detail
             else:
                 error = client.get('error')
                 error_num = int(error) + 1
@@ -82,88 +84,86 @@ class MovieSpider(scrapy.Spider):
                     client.set('error', int(error) + 1)
                     client.expire("error", 60 * 60 * 12)
                 continue
-            # 类型
             categories = item.get('categories')
-            if categories is None:
+            if categories == None:
                 continue
-            for category in categories:
-                category_item = CategoryItem()
-                category_item['id'] = id
-                category_item['category_id'] = category['id']
-                category_item['name'] = category['name']
-                category_item['url'] = category['url']
-                category_item['sub_ype'] = category['subType']
-                category_item['sub_name'] = category['subName']
-                category_item['level'] = category['level']
-                category_item['qipu_id'] = category['qipuId']
-                category_item['parent_id'] = category['parentId']
-                category_item['timestamp'] = int(time.time())
-                yield category_item
+            for citem in categories:
+                category = CategoryMovieItem()
+                category['num_id'] = citem['id']
+                category['title'] = citem['name']
+                category['url'] = citem['url']
+                category['category'] = citem['subName']
+                category['source'] = "iqiyi"
+                yield category
             if item.get('cast') is not None:
                 directors = item['cast'].get('director')
                 if directors is not None:
                     for director in directors:
                         # director组装模型
-                        director_item = DirectorItem()
-                        director_item['id'] = id
-                        director_item['name'] = director['name']
-                        director_item['image_url'] = director.get('image_url')
+                        director_item = {}
                         director_item['director_id'] = director['id']
-                        director_item['timestamp'] = int(time.time())
 
-                        res = client.sadd('performerid', director['id'])
+                        res = client.sadd('performerid', director_item['director_id'])
                         if res == 1:
-                            director_detail_url = 'https://www.iqiyi.com/lib/s_' + str(director['id']) + '.html'
-                            yield scrapy.Request(director_detail_url, callback=self.performer_detail, meta={'id': director['id']})
-                        yield director_item
+                            director_detail_url = 'https://www.iqiyi.com/lib/s_' + str(
+                                director_item['director_id']) + '.html'
+                            yield scrapy.Request(director_detail_url, callback=self.performer_detail,
+                                                 meta={'id': director_item['director_id']})
 
                 main_charactors = item['cast'].get('main_charactor') or None
                 if main_charactors != None:
                     for main_charactor in main_charactors:
-                        main_charactor_item = MainCharactorItem()
-                        main_charactor_item['id'] = id
-                        main_charactor_item['name'] = main_charactor['name']
+                        main_charactor_item = MoviePerformerItem()
+                        main_charactor_item['id'] = main_charactor['id']
+                        main_charactor_item['performer'] = main_charactor['name']
                         main_charactor_item['image_url'] = main_charactor.get('image_url')
-                        main_charactor_item['character'] = ",".join(main_charactor['character']).replace('"', '\\"')
-                        main_charactor_item['main_charactor_id'] = main_charactor['id']
-                        main_charactor_item['timestamp'] = int(time.time())
-                        res = client.sadd('performer_id', main_charactor['id'])
+                        main_charactor_item['role'] = ",".join(main_charactor['character']).replace('"', '\\"')
+                        main_charactor_item['movie_id'] = item['tvId']
+                        res = client.sadd('performer_id', main_charactor_item['id'])
                         if res == 1:
-                            main_charactor_url = 'https://www.iqiyi.com/lib/s_' + str(main_charactor['id']) + '.html'
+                            main_charactor_url = 'https://www.iqiyi.com/lib/s_' + str(
+                                main_charactor_item['id']) + '.html'
                             print(main_charactor_url)
-                            yield scrapy.Request(main_charactor_url, callback=self.performer_detail, meta={'id': main_charactor['id']})
+                            yield scrapy.Request(main_charactor_url, callback=self.performer_detail,
+                                                 meta={'id': main_charactor_item['id']})
                         yield main_charactor_item
-
-                actors = item['cast'].get('actor')
-                if actors is not None:
-                    for actor in actors:
-                        actor_item = ActorItem()
-                        actor_item['id'] = id
-                        actor_item['name'] = actor['name']
-                        actor_item['image_url'] = actor.get('image_url')
-                        actor_item['character'] = ','.join(actor['character'])
-                        actor_item['actor_id'] = actor['id']
-                        actor_item['timestamp'] = int(time.time())
-                        res = client.sadd('performer_id', actor['id'])
-                        if res == 1:
-
-                            actor_detail_url = 'https://www.iqiyi.com/lib/s_' + str(actor['id']) + '.html'
-                            yield scrapy.Request(actor_detail_url, callback=self.performer_detail, meta={'id': actor['id']})
-                        yield actor_item
 
     def performer_detail(self, response):
         id = response.meta['id']
         detail = PerformerDetailTableItem()
+        detail['id'] = id
         detail['name'] = response.xpath("//h1[@itemprop='name']/text()").extract_first()
-        detail['job_title'] = response.xpath("normalize-space(//li[@itemprop='jobTitle']/text())").extract_first()
+        detail['occupation'] = response.xpath("normalize-space(//li[@itemprop='jobTitle']/text())").extract_first()
         detail['width'] = response.xpath("normalize-space(//li[@itemprop='weight']/text())").extract_first()
         detail['height'] = response.xpath("normalize-space(//li[@itemprop='height']/text())").extract_first()
-        detail['blood'] = response.xpath(
+        detail['bloodtype'] = response.xpath(
             "normalize-space(//div[@class='mx_topic-item']/ul/li[last()]/text())").extract_first()
         detail['address'] = response.xpath("normalize-space(//li[@itemprop='birthplace']/text())").extract_first()
-        detail['image_url'] = "http:" + response.xpath("//img[@itemprop='image']/@src").extract_first()
-        detail['timestamp'] = int(time.time())
-        detail['performer_id'] = id
+        detail['imageurl'] = "http:" + response.xpath("//img[@itemprop='image']/@src").extract_first()
+        detail['birthday'] = response.xpath("//li[@class='birthdate']/text()").extract_first()
+        # detail['id'] = id
+        # detail['e_name'] = response.xpath("//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[1]/dd[1]/text()").extract_first()
+        detail['e_name'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[1]/dd[1]/text())").extract_first()
+        detail['sex'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[1]/dd[2]/text())").extract_first()
+        detail['location'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[1]/dd[5]/text())").extract_first()
+        detail['school'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[1]/dd[6]/text())").extract_first()
+        detail['fameyear'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[1]/dd[7]/text())").extract_first()
+
+        detail['alias'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[2]/dd[1]/text())").extract_first()
+        detail['constellation'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[2]/dd[4]/text())").extract_first()
+        detail['residentialAddress'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[2]/dd[5]/text())").extract_first()
+        detail['brokerageAgency'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[2]/dd[6]/text())").extract_first()
+        detail['hobby'] = response.xpath(
+            "normalize-space(//div[contains(@class, 'basic-info') and contains(@class, 'clearfix')]/dl[2]/dd[7]/text())").extract_first()
         try:
             # 描述
             detail['des'] = response.xpath("//p[@class='mx_detail']/text()").extract()[-2].replace(' ', '').strip()

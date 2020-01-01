@@ -64,9 +64,9 @@ COOKIE_DEBUG = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'aqiyi.pipelines.MoviePipeline': 300,
-# }
+ITEM_PIPELINES = {
+   'aqiyi.pipelines.MoviePipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -90,13 +90,23 @@ COOKIE_DEBUG = True
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # 数据库配置
-DB_URL = ''
-DB_USER = ''
-DB_PASSWORD = ''
-DB_NAME = ''
+DB_URL = 'localhost'
+DB_USER = 'root'
+DB_PASSWORD = '12345678'
+DB_NAME = 'MovieSpider'
 
 
 #redis地址
 REDIS_HOST='127.0.0.1'
 REDIS_PORT=6379
 REDIS_DB=0
+
+
+#阿里云配置
+ACCESSKEYID = 'LTAIbdu14y5Gkx78'
+ACCESSKEYSECRET = 'XUKhoYSTjieG8awm3tVzv41GxXRTiM'
+ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
+BUCKET = 'zcmovie'
+#阿里云OSS保存地址
+MOVIETABLEFOLDER='movie'
+PERSONFOLDER='actor'

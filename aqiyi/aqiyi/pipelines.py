@@ -7,9 +7,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from aqiyi.aqiyi.exceptions import TableNotFoundException
-from aqiyi.aqiyi.models import Movie
-
+from aqiyi.exceptions import TableNotFoundException
+from aqiyi.models import Movie
+from aqiyi.items import PerformerDetailTableItem, MovieItem, MovieDetailItem, MoviePerformerItem, CategoryMovieItem
+from scrapy.utils.project import get_project_settings
 
 class MysqlPipeline:
 
@@ -22,14 +23,14 @@ class MysqlPipeline:
     @classmethod
     def from_crawler(cls, crawler):
         return cls(
-            db_url=crawler.setting.get("DB_URL"),
-            db_name=crawler.setting.get("DB_NAME"),
-            db_user=crawler.setting.get("DB_USER"),
-            db_password=crawler.setting.get("DB_PASSWORD")
+            db_url=get_project_settings().get("DB_URL"),
+            db_name=get_project_settings().get("DB_NAME"),
+            db_user=get_project_settings().get("DB_USER"),
+            db_password=get_project_settings().get("DB_PASSWORD")
         )
 
     def open_spider(self, spider):
-        self.engine = create_engine("mysql+mysqldb://{}:{}@{}:3306/{}?charset=utf8"
+        self.engine = create_engine("mysql+cymysql://{}:{}@{}:3306/{}?charset=utf8"
                                .format(self.db_user, self.db_password, self.db_url, self.db_name),
                                encoding='utf-8', echo=True)
         self.session = Session(bind=self.engine)
@@ -40,12 +41,26 @@ class MysqlPipeline:
 
 class MoviePipeline(MysqlPipeline):
     def process_item(self, item, spider):
-        movie = Movie(**item)
-        self.session.add(movie)
-        self.session.commit()
+        if isinstance(item, MovieItem):
+            movie = Movie(**item)
+            self.session.add(movie)
+            self.session.commit()
+        if isinstance(item, PerformerDetailTableItem):
+            detail = PerformerDetailTableItem(**item)
+            self.session.add(detail)
+            self.session.commit()
+        if isinstance(item, MovieDetailItem):
+            movie_detail = MovieDetailItem(**item)
+            self.session.add(movie_detail)
+            self.session.commit()
+        if isinstance(item,CategoryMovieItem):
+            category = CategoryMovieItem(**item)
+            self.session.add(category)
+            self.session.commit()
+        if isinstance(item, MoviePerformerItem):
+            performer = MoviePerformerItem(**item)
+            self.session.add(performer)
+            self.session.commit()
         return item
 
 
-class MovieDetailPipeline(MysqlPipeline):
-    def process_item(self, item, spider):
-        pass

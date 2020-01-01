@@ -7,15 +7,70 @@
 
 import scrapy
 
-
-class ActorItem(scrapy.Item):
+class MovieItem(scrapy.Item):
     id = scrapy.Field()
-    name = scrapy.Field()
+    moviename = scrapy.Field()
+    time = scrapy.Field()
+    url = scrapy.Field()
+    imagepath = scrapy.Field()
+    saveimagepath = scrapy.Field()
+    score = scrapy.Field()
+    status =  scrapy.Field()
+    source = scrapy.Field()
+
+class MovieDetailItem(scrapy.Item):
+    id = scrapy.Field()
+    director = scrapy.Field()
+    director_id = scrapy.Field()
+    keyword = scrapy.Field()
+    category = scrapy.Field()
+    des = scrapy.Field()
+    movie_id = scrapy.Field()
+
+
+class CategoryMovieItem(scrapy.Item):
+    num_id = scrapy.Field()
+    category = scrapy.Field()
+    url = scrapy.Field()
+    title = scrapy.Field()
+    source = scrapy.Field()
+
+class MoviePerformerItem(scrapy.Item):
+    id = scrapy.Field()
+    performer = scrapy.Field()
     image_url = scrapy.Field()
-    character = scrapy.Field()
-    actor_id = scrapy.Field()
-    timestamp = scrapy.Field()
-    save_image_url = scrapy.Field()
+    role = scrapy.Field()
+    movie_id =scrapy.Field()
+
+
+class PerformerDetailTableItem(scrapy.Item):
+    name = scrapy.Field()
+    occupation = scrapy.Field()
+    width = scrapy.Field()
+    height = scrapy.Field()
+    bloodtype = scrapy.Field()
+    address = scrapy.Field()
+    imageurl = scrapy.Field()
+    des = scrapy.Field()
+    saveimageurl = scrapy.Field()
+    birthday = scrapy.Field()
+    id = scrapy.Field()
+
+    e_name = scrapy.Field()  # 外文名
+    alias = scrapy.Field()  # 别名
+    sex = scrapy.Field()
+    constellation = scrapy.Field()  # 星座
+    location = scrapy.Field()
+    residentialAddress = scrapy.Field()  # 居住地址
+    school = scrapy.Field()
+    brokerageAgency = scrapy.Field()  # 经纪公司
+    fameyear = scrapy.Field()  # 成名年代
+    hobby = scrapy.Field()
+
+
+class MovieUrlItem(scrapy.Item):
+    movieurl = scrapy.Field()
+
 
 
 class CategoryItem(scrapy.Item):
@@ -29,55 +84,3 @@ class CategoryItem(scrapy.Item):
     qipu_id = scrapy.Field()
     parent_id = scrapy.Field()
     timestamp = scrapy.Field()
-
-
-class DirectorItem(scrapy.Item):
-    id = scrapy.Field()
-    name = scrapy.Field()
-    image_url = scrapy.Field()
-    director_id = scrapy.Field()
-    timestamp = scrapy.Field()
-    save_image_url = scrapy.Field()
-
-
-class MainCharactorItem(scrapy.Item):
-    id = scrapy.Field()
-    name = scrapy.Field()
-    image_url = scrapy.Field()
-    character = scrapy.Field()
-    main_charactor_id = scrapy.Field()
-    timestamp = scrapy.Field()
-    save_image_url = scrapy.Field()
-
-
-class MovieTableItem(scrapy.Item):
-    id = scrapy.Field()
-    movie_id = scrapy.Field()
-    channel_id = scrapy.Field()
-    description = scrapy.Field()
-    name = scrapy.Field()
-    play_url = scrapy.Field()
-    duration = scrapy.Field()
-    focus = scrapy.Field()
-    score = scrapy.Field()
-    second_info = scrapy.Field()
-    format_period = scrapy.Field()
-    site_id = scrapy.Field()
-    issue_time = scrapy.Field()
-    image_url = scrapy.Field()
-    timestamp = scrapy.Field()
-    save_image_url = scrapy.Field()
-
-
-class PerformerDetailTableItem(scrapy.Item):
-    name = scrapy.Field()
-    job_title = scrapy.Field()
-    width = scrapy.Field()
-    height = scrapy.Field()
-    blood = scrapy.Field()
-    address = scrapy.Field()
-    image_url = scrapy.Field()
-    des = scrapy.Field()
-    save_image_url = scrapy.Field()
-    timestamp = scrapy.Field()
-    performer_id = scrapy.Field()

@@ -10,6 +10,9 @@ scrapy = "*"
 flask = "*"
 sqlalchemy = "*"
 scrapy-redis = "*"
+"oss2" = "*"
+requests = "*"
+cymysql = "*"
 
 [requires]
 python_version = "3.6"
