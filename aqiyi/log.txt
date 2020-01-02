@@ -1,0 +1,52 @@
+2020-01-02 21:30:28,255 INFO sqlalchemy.engine.base.Engine SHOW VARIABLES LIKE 'sql_mode'
+2020-01-02 21:30:28,255 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,258 INFO sqlalchemy.engine.base.Engine SHOW VARIABLES LIKE 'lower_case_table_names'
+2020-01-02 21:30:28,258 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,259 INFO sqlalchemy.engine.base.Engine SELECT DATABASE()
+2020-01-02 21:30:28,259 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,260 INFO sqlalchemy.engine.base.Engine show collation where `Charset` = 'utf8mb4' and `Collation` = 'utf8mb4_bin'
+2020-01-02 21:30:28,260 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,269 INFO sqlalchemy.engine.base.Engine SELECT CAST('test plain returns' AS CHAR(60)) AS anon_1
+2020-01-02 21:30:28,269 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,270 INFO sqlalchemy.engine.base.Engine SELECT CAST('test unicode returns' AS CHAR(60)) AS anon_1
+2020-01-02 21:30:28,270 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,271 INFO sqlalchemy.engine.base.Engine SELECT CAST('test collated returns' AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_bin AS anon_1
+2020-01-02 21:30:28,271 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,273 INFO sqlalchemy.engine.base.Engine DESCRIBE `movietable`
+2020-01-02 21:30:28,273 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,277 INFO sqlalchemy.engine.base.Engine DESCRIBE `moviedetailtable`
+2020-01-02 21:30:28,278 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,280 INFO sqlalchemy.engine.base.Engine DESCRIBE `categoryMovieTable`
+2020-01-02 21:30:28,280 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,282 INFO sqlalchemy.engine.base.Engine DESCRIBE `movieperformertable`
+2020-01-02 21:30:28,282 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:28,285 INFO sqlalchemy.engine.base.Engine DESCRIBE `performerdetailtable`
+2020-01-02 21:30:28,285 INFO sqlalchemy.engine.base.Engine ()
+2020-01-02 21:30:40,926 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2020-01-02 21:30:40,928 INFO sqlalchemy.engine.base.Engine INSERT INTO movietable (id, moviename, time, url, imagepath, saveimagepath, score, status, source) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+2020-01-02 21:30:40,928 INFO sqlalchemy.engine.base.Engine (479545200, '蓬门今始为君开', '02:09:45', 'http://www.iqiyi.com/v_19rrlvuja4.html', 'http://pic6.iqiyipic.com/image/20191231/04/ed/v_110360101_m_601_m5.jpg', None, 6.6, 1, 'iqiyi')
+2020-01-02 21:30:40,932 INFO sqlalchemy.engine.base.Engine COMMIT
+2020-01-02 21:30:40,999 INFO sqlalchemy.engine.base.Engine BEGIN (implicit)
+2020-01-02 21:30:41,000 INFO sqlalchemy.engine.base.Engine INSERT INTO moviedetailtable (director, director_id, keyword, category, des, movie_id) VALUES (%s, %s, %s, %s, %s, %s)
+2020-01-02 21:30:41,000 INFO sqlalchemy.engine.base.Engine ([{'id': 207384805, 'name': '约翰·福特', 'image_url': 'http://pic2.iqiyipic.com/image/20181228/3c/40/p_2001729_m_601_m5.jpg'}], None, '妙趣横生的爱情故事', '杜比音效,纯爱,经典,美国,英语,喜剧,爱情', '桑顿是重量级拳王，因致命一击打死对手，从此退出拳坛，由美国返回故乡爱尔兰，隐居家乡间不问世事，返乡途中遇到玛丽惊为天人，被车夫麦克林调侃是口渴所产生的幻影。玛丽暗中帮桑顿打扫祖产，借此表情，桑顿托麦克林作媒，玛丽的哥哥威尔却多加阻挠，幸赖隆纳根神父和普雷佛牧师帮助才得以成亲。威尔喜欢提兰寡妇，故让玛丽出嫁，险谋被识破后恼羞成怒，只给玛丽一点点嫁妆。爱尔兰民风保守，玛丽认为扣留嫁妆是对丈夫的侮辱，经常抱怨要求取回，但桑顿无意争夺名利，玛利认为丈夫是个懦夫，怕村人取笑想逃离家乡，桑顿把她拖回娘家，并与威尔大打出手，一场恶斗威尔被打得口服心服，玛丽才知丈夫不是懦夫，尽释前嫌和好如初…', 479545200)
+2020-01-02 21:30:41,000 INFO sqlalchemy.engine.base.Engine ROLLBACK
+https://www.iqiyi.com/lib/s_207385205.html
+https://www.iqiyi.com/lib/s_227690105.html
+https://www.iqiyi.com/lib/s_214984405.html
+https://www.iqiyi.com/lib/s_205161505.html
+https://www.iqiyi.com/lib/s_215437705.html
+https://www.iqiyi.com/lib/s_239658405.html
+https://www.iqiyi.com/lib/s_201969005.html
+https://www.iqiyi.com/lib/s_214044405.html
+https://www.iqiyi.com/lib/s_205709005.html
+https://www.iqiyi.com/lib/s_225611405.html
+https://www.iqiyi.com/lib/s_214956605.html
+https://www.iqiyi.com/lib/s_215033505.html
+https://www.iqiyi.com/lib/s_214789405.html
+https://www.iqiyi.com/lib/s_216368005.html
+https://www.iqiyi.com/lib/s_216368105.html
+https://www.iqiyi.com/lib/s_226552505.html
+https://www.iqiyi.com/lib/s_223674505.html
+https://www.iqiyi.com/lib/s_232467105.html
+https://www.iqiyi.com/lib/s_232467205.html
+https://www.iqiyi.com/lib/s_232467305.html

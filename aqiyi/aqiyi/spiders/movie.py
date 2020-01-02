@@ -13,7 +13,8 @@ client.set("error", 0)
 # 12小时过期
 client.expire("error", 60 * 60 * 12)
 
-from aqiyi.items import PerformerDetailTableItem, MovieItem, MovieDetailItem, MoviePerformerItem, CategoryMovieItem
+from aqiyi.items import PerformerDetailTableItem, MovieItem, MovieDetailItem, MoviePerformerItem, CategoryMovieItem, \
+    DirectorItem
 
 
 class MovieSpider(scrapy.Spider):
@@ -68,10 +69,13 @@ class MovieSpider(scrapy.Spider):
                 yield movie
 
                 movie_detail = MovieDetailItem()
-                movie_detail['director'] = item['cast'].get('director')
+                directors = [director['name'] for director in item['cast'].get('director') ]
+                movie_detail['director'] = ','.join(directors)
                 movie_detail['director_id'] = item['cast'].get('id')
-                movie_detail['des'] = item['description']
-                movie_detail['category'] = ','.join([category['name'] for category in item['categories']])
+                movie_detail['des'] = item.get('description')
+                categories = [category['name'] for category in item['categories']]
+                print(categories)
+                movie_detail['category'] = ','.join(categories)
                 movie_detail['movie_id'] = item['tvId']
                 movie_detail['keyword'] = item['focus']
                 yield movie_detail
@@ -94,21 +98,27 @@ class MovieSpider(scrapy.Spider):
                 category['url'] = citem['url']
                 category['category'] = citem['subName']
                 category['source'] = "iqiyi"
-                yield category
+                res = client.sadd("num_id", category['num_id'])
+                if res == 1:
+                    yield category
+
             if item.get('cast') is not None:
                 directors = item['cast'].get('director')
                 if directors is not None:
                     for director in directors:
                         # director组装模型
-                        director_item = {}
-                        director_item['director_id'] = director['id']
+                        director_item = DirectorItem()
+                        director_item['id'] = director['id']
+                        director_item['name'] = director['name']
+                        director_item['movie_id'] = item['tvId']
 
-                        res = client.sadd('performerid', director_item['director_id'])
+                        res = client.sadd('performerid', director_item['id'])
                         if res == 1:
                             director_detail_url = 'https://www.iqiyi.com/lib/s_' + str(
-                                director_item['director_id']) + '.html'
+                                director_item['id']) + '.html'
                             yield scrapy.Request(director_detail_url, callback=self.performer_detail,
-                                                 meta={'id': director_item['director_id']})
+                                                 meta={'id': director_item['id']})
+                            yield director_item
 
                 main_charactors = item['cast'].get('main_charactor') or None
                 if main_charactors != None:
@@ -119,14 +129,14 @@ class MovieSpider(scrapy.Spider):
                         main_charactor_item['image_url'] = main_charactor.get('image_url')
                         main_charactor_item['role'] = ",".join(main_charactor['character']).replace('"', '\\"')
                         main_charactor_item['movie_id'] = item['tvId']
-                        res = client.sadd('performer_id', main_charactor_item['id'])
+                        res = client.sadd('performerid', main_charactor_item['id'])
                         if res == 1:
                             main_charactor_url = 'https://www.iqiyi.com/lib/s_' + str(
                                 main_charactor_item['id']) + '.html'
                             print(main_charactor_url)
                             yield scrapy.Request(main_charactor_url, callback=self.performer_detail,
                                                  meta={'id': main_charactor_item['id']})
-                        yield main_charactor_item
+                            yield main_charactor_item
 
     def performer_detail(self, response):
         id = response.meta['id']
@@ -134,7 +144,7 @@ class MovieSpider(scrapy.Spider):
         detail['id'] = id
         detail['name'] = response.xpath("//h1[@itemprop='name']/text()").extract_first()
         detail['occupation'] = response.xpath("normalize-space(//li[@itemprop='jobTitle']/text())").extract_first()
-        detail['width'] = response.xpath("normalize-space(//li[@itemprop='weight']/text())").extract_first()
+        detail['weight'] = response.xpath("normalize-space(//li[@itemprop='weight']/text())").extract_first()
         detail['height'] = response.xpath("normalize-space(//li[@itemprop='height']/text())").extract_first()
         detail['bloodtype'] = response.xpath(
             "normalize-space(//div[@class='mx_topic-item']/ul/li[last()]/text())").extract_first()

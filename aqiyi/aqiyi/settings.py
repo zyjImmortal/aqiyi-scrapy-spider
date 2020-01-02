@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import datetime
 # Scrapy settings for aqiyi project
 #
 # For simplicity, this file contains only settings considered important or
@@ -13,6 +13,9 @@ BOT_NAME = 'aqiyi'
 
 SPIDER_MODULES = ['aqiyi.spiders']
 NEWSPIDER_MODULE = 'aqiyi.spiders'
+
+TO_DAY = datetime.datetime.now()
+LOG_FILE = "logs/scrapy_log_{}_{}_{}.log".format(TO_DAY.year, TO_DAY.month, TO_DAY.day)
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) ' \
@@ -93,7 +96,7 @@ ITEM_PIPELINES = {
 DB_URL = 'localhost'
 DB_USER = 'root'
 DB_PASSWORD = '12345678'
-DB_NAME = 'MovieSpider'
+DB_NAME = 'IqiyiMovieSpider'
 
 
 #redis地址

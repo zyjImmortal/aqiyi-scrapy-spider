@@ -44,17 +44,16 @@ class MoviePerformerItem(scrapy.Item):
 
 
 class PerformerDetailTableItem(scrapy.Item):
+    id = scrapy.Field()
     name = scrapy.Field()
-    occupation = scrapy.Field()
-    width = scrapy.Field()
     height = scrapy.Field()
+    weight = scrapy.Field()
     bloodtype = scrapy.Field()
     address = scrapy.Field()
     imageurl = scrapy.Field()
-    des = scrapy.Field()
     saveimageurl = scrapy.Field()
+    des = scrapy.Field()
     birthday = scrapy.Field()
-    id = scrapy.Field()
 
     e_name = scrapy.Field()  # 外文名
     alias = scrapy.Field()  # 别名
@@ -66,12 +65,15 @@ class PerformerDetailTableItem(scrapy.Item):
     brokerageAgency = scrapy.Field()  # 经纪公司
     fameyear = scrapy.Field()  # 成名年代
     hobby = scrapy.Field()
-
+    occupation = scrapy.Field()
 
 class MovieUrlItem(scrapy.Item):
     movieurl = scrapy.Field()
 
-
+class DirectorItem(scrapy.Field):
+    id = scrapy.Field()
+    name = scrapy.Field()
+    movie_id = scrapy.Field()
 
 class CategoryItem(scrapy.Item):
     id = scrapy.Field()

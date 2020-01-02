@@ -8,9 +8,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from aqiyi.exceptions import TableNotFoundException
-from aqiyi.models import Movie
-from aqiyi.items import PerformerDetailTableItem, MovieItem, MovieDetailItem, MoviePerformerItem, CategoryMovieItem
+from aqiyi.models import Movie, Base, MovieDetail, MoviePerformer, CategoryMovie, PerformerDetail, Director
+from aqiyi.items import PerformerDetailTableItem, MovieItem, MovieDetailItem, MoviePerformerItem, CategoryMovieItem, \
+    DirectorItem
 from scrapy.utils.project import get_project_settings
+
+from aqiyi.util import upload
+
 
 class MysqlPipeline:
 
@@ -34,6 +38,7 @@ class MysqlPipeline:
                                .format(self.db_user, self.db_password, self.db_url, self.db_name),
                                encoding='utf-8', echo=True)
         self.session = Session(bind=self.engine)
+        Base.metadata.create_all(self.engine)
 
     def close_spider(self, spider):
         self.session.close()
@@ -42,23 +47,29 @@ class MysqlPipeline:
 class MoviePipeline(MysqlPipeline):
     def process_item(self, item, spider):
         if isinstance(item, MovieItem):
+            item['saveimagepath'] = upload(item['imageurl'], 'moviepic')
             movie = Movie(**item)
             self.session.add(movie)
             self.session.commit()
+        if isinstance(item, DirectorItem):
+            director = Director(**item)
+            self.session.add(director)
+            self.session.commit()
         if isinstance(item, PerformerDetailTableItem):
-            detail = PerformerDetailTableItem(**item)
+            item['saveimageurl'] = upload(item['imageurl'], 'personpic')
+            detail = PerformerDetail(**item)
             self.session.add(detail)
             self.session.commit()
         if isinstance(item, MovieDetailItem):
-            movie_detail = MovieDetailItem(**item)
+            movie_detail = MovieDetail(**item)
             self.session.add(movie_detail)
             self.session.commit()
         if isinstance(item,CategoryMovieItem):
-            category = CategoryMovieItem(**item)
+            category = CategoryMovie(**item)
             self.session.add(category)
             self.session.commit()
         if isinstance(item, MoviePerformerItem):
-            performer = MoviePerformerItem(**item)
+            performer = MoviePerformer(**item)
             self.session.add(performer)
             self.session.commit()
         return item
